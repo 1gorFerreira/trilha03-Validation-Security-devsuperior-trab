@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,7 @@ public class CityService {
 	
 	@Transactional(readOnly = true)
 	public List<CityDTO> findAll(){
-		List<City> entities = cityRepository.findAll();
+		List<City> entities = cityRepository.findAll(Sort.by("name"));
 		return entities.stream().map(entity -> new CityDTO(entity)).toList();
 	}
 	
