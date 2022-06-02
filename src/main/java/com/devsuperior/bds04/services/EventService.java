@@ -1,9 +1,10 @@
 package com.devsuperior.bds04.services;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,9 +24,9 @@ public class EventService {
 	private CityRepository cityRepository;
 	
 	@Transactional(readOnly = true)
-	public List<EventDTO> findAll(){
-		List<Event> entities = eventRepository.findAll();
-		return entities.stream().map(entity -> new EventDTO(entity)).toList();
+	public Page<EventDTO> findAll(Pageable pageable){
+		Page<Event> page = eventRepository.findAll(pageable);
+		return page.map(x -> new EventDTO(x));
 	}
 	
 	@Transactional(readOnly = true)
