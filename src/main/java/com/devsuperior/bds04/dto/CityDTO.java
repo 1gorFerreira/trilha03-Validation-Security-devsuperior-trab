@@ -1,6 +1,8 @@
 package com.devsuperior.bds04.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.devsuperior.bds04.entities.City;
 
@@ -9,6 +11,8 @@ public class CityDTO implements Serializable {
 	
 	private Long id;
 	private String name;
+	
+	private List<EventDTO> events = new ArrayList<>();
 	
 	public CityDTO() {
 	}
@@ -21,6 +25,7 @@ public class CityDTO implements Serializable {
 	public CityDTO(City entity) {
 		id = entity.getId();
 		name = entity.getName();
+		events = entity.getEvents().stream().map(event -> new EventDTO(event)).toList();
 	}
 
 	public Long getId() {
@@ -38,4 +43,9 @@ public class CityDTO implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public List<EventDTO> getEvents() {
+		return events;
+	}
+	
 }

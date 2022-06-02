@@ -62,8 +62,8 @@ public class UserService {
 	
 	private void copyDtoToEntity(UserDTO dto, User entity) {
 		entity.setEmail(dto.getEmail());
-		entity.getRoles().clear();
 		
+		entity.getRoles().clear();
 		for(RoleDTO rolesDto : dto.getRoles()) {
 			Role role = roleRepository.getOne(rolesDto.getId());
 			entity.getRoles().add(role);
