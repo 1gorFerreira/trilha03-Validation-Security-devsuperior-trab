@@ -3,6 +3,8 @@ package com.devsuperior.bds04.resources;
 import java.net.URI;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,7 +40,7 @@ public class CityResource {
 	}
 	
 	@PostMapping
-	public ResponseEntity<CityDTO> insert(@RequestBody CityDTO dto){
+	public ResponseEntity<CityDTO> insert(@Valid @RequestBody CityDTO dto){
 		CityDTO newDto = cityService.insert(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(dto.getId()).toUri();
@@ -46,7 +48,7 @@ public class CityResource {
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<CityDTO> update(@PathVariable Long id, @RequestBody CityDTO dto){
+	public ResponseEntity<CityDTO> update(@Valid @PathVariable Long id, @Valid @RequestBody CityDTO dto){
 		CityDTO newDto = cityService.update(id, dto);
 		return ResponseEntity.ok().body(newDto);
 	}

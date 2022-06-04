@@ -2,6 +2,8 @@ package com.devsuperior.bds04.resources;
 
 import java.net.URI;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +41,7 @@ public class EventResource {
 	}
 	
 	@PostMapping
-	public ResponseEntity<EventDTO> insert(@RequestBody EventDTO dto){
+	public ResponseEntity<EventDTO> insert(@Valid @RequestBody EventDTO dto){
 		EventDTO newDto = eventService.insert(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(dto.getId()).toUri();
@@ -47,7 +49,7 @@ public class EventResource {
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<EventDTO> update(@PathVariable Long id, @RequestBody EventDTO dto){
+	public ResponseEntity<EventDTO> update(@Valid @PathVariable Long id, @Valid @RequestBody EventDTO dto){
 		EventDTO newDto = eventService.update(id, dto);
 		return ResponseEntity.ok().body(newDto);
 	}
