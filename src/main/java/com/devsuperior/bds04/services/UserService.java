@@ -2,7 +2,10 @@ package com.devsuperior.bds04.services;
 
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,8 @@ import com.devsuperior.bds04.entities.Role;
 import com.devsuperior.bds04.entities.User;
 import com.devsuperior.bds04.repositories.RoleRepository;
 import com.devsuperior.bds04.repositories.UserRepository;
+import com.devsuperior.bds04.services.exceptions.DataBaseException;
+import com.devsuperior.bds04.services.exceptions.ResourceNotFoundException;
 
 @Service
 public class UserService {
@@ -35,7 +40,8 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public UserDTO findById(Long id) {
 		Optional<User> obj = userRepository.findById(id);
-		return new UserDTO(obj.get());
+		User entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found: " + id));
+		return new UserDTO(entity);
 	}
 	
 	@Transactional
@@ -49,14 +55,24 @@ public class UserService {
 	
 	@Transactional
 	public UserDTO update(Long id, UserUpdateDTO dto) {
-		User entity = userRepository.getOne(id);
-		copyDtoToEntity(dto, entity);
-		entity = userRepository.save(entity);
-		return new UserDTO(entity);
+		try {
+			User entity = userRepository.getOne(id);
+			copyDtoToEntity(dto, entity);
+			entity = userRepository.save(entity);
+			return new UserDTO(entity);
+		} catch(EntityNotFoundException e) {
+			throw new ResourceNotFoundException("Id Not found: " + id);
+		}
 	}
 	
 	public void delete(Long id) {
-		userRepository.deleteById(id);
+		try {
+			userRepository.deleteById(id);
+		} catch(EntityNotFoundException e) {
+			throw new ResourceNotFoundException("Id not found: " + id);
+		} catch(DataIntegrityViolationException e) {
+			throw new DataBaseException("Integrity violation");
+		}
 	}
 	
 	

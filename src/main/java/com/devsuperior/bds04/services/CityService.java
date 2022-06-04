@@ -3,7 +3,10 @@ package com.devsuperior.bds04.services;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +17,8 @@ import com.devsuperior.bds04.entities.City;
 import com.devsuperior.bds04.entities.Event;
 import com.devsuperior.bds04.repositories.CityRepository;
 import com.devsuperior.bds04.repositories.EventRepository;
+import com.devsuperior.bds04.services.exceptions.DataBaseException;
+import com.devsuperior.bds04.services.exceptions.ResourceNotFoundException;
 
 @Service
 public class CityService {
@@ -33,7 +38,8 @@ public class CityService {
 	@Transactional(readOnly = true)
 	public CityDTO findById(Long id) {
 		Optional<City> obj = cityRepository.findById(id);
-		return new CityDTO(obj.get());
+		City entity = obj.orElseThrow(() -> new ResourceNotFoundException("Id not found: " + id));
+		return new CityDTO(entity);
 	}
 	
 	@Transactional
@@ -46,14 +52,24 @@ public class CityService {
 	
 	@Transactional
 	public CityDTO update(Long id, CityDTO dto) {
-		City entity = cityRepository.getOne(id);
-		copyDtoToEntity(dto, entity);
-		entity = cityRepository.save(entity);
-		return new CityDTO(entity);
+		try {
+			City entity = cityRepository.getOne(id);
+			copyDtoToEntity(dto, entity);
+			entity = cityRepository.save(entity);
+			return new CityDTO(entity);
+		} catch(EntityNotFoundException e) {
+			throw new ResourceNotFoundException("Id not found: " + id);
+		}
 	}
 	
 	public void delete(Long id) {
-		cityRepository.deleteById(id);
+		try {
+			cityRepository.deleteById(id);
+		} catch(EntityNotFoundException e) {
+			throw new ResourceNotFoundException("Id not found: " + id);
+		} catch(DataIntegrityViolationException e) {
+			throw new DataBaseException("Integrity violation");
+		}
 	}
 	
 	
